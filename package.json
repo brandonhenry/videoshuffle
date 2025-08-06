@@ -1,0 +1,14 @@
+{
+  "name": "videoshuffle",
+  "version": "1.0.0",
+  "description": "A simple Electron app for video shuffling",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^25.0.0"
+  },
+  "author": "",
+  "license": "MIT"
+}
