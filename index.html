@@ -1,11 +1,54 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>VideoShuffle</title>
-  </head>
-  <body>
-    <h1>Welcome to VideoShuffle</h1>
-    <div id="app"></div>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fractal Video Shufflr</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Fractal Video Shufflr</h1>
+      <a id="donate-link" href="https://ko-fi.com/thebrandonhenry" target="_blank">Donate For Updates</a>
+    </header>
+    <main>
+      <div class="controls">
+        <button id="select-files">Select Files</button>
+        <button id="process-videos">Shuffle & Merge!</button>
+        <button id="open-settings">⚙️</button>
+      </div>
+      <ul id="file-list"></ul>
+      <div id="status"></div>
+      <progress id="progress-bar" max="100" hidden></progress>
+      <div id="time-remaining" hidden></div>
+      <div id="result-actions" class="actions hidden">
+        <button id="open-video">Play Video</button>
+        <button id="open-folder">Show in Folder</button>
+      </div>
+    </main>
+    <!-- Previous Projects History -->
+    <section id="history-section">
+      <h2>Previous Projects</h2>
+      <button id="clear-history">Clear All</button>
+      <ul id="history-list"></ul>
+    </section>
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Settings</h2>
+        <label><input type="checkbox" id="remove-audio"/> Remove audio</label>
+        <label>Min Clip Length (s): <input type="number" id="min-length" min="1" value="3"/></label>
+        <label>Max Clip Length (s): <input type="number" id="max-length" min="1" value="5"/></label>
+        <label>Max Output Duration (minutes or mm:ss): <input type="text" id="max-duration" value="10:00" pattern="\\d+(:\\d{2})?"/></label>
+        <label><input type="checkbox" id="dark-mode"/> Dark mode</label>
+        <div class="modal-actions">
+          <button id="save-settings">Save</button>
+          <button id="cancel-settings">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="renderer.js"></script>
+</body>
 </html>

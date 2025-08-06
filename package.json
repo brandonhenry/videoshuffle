@@ -4,11 +4,54 @@
   "description": "A simple Electron app for video shuffling",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "dependencies": {
-    "electron": "^25.0.0"
+    "electron": "^25.9.8",
+    "electron-reload": "*",
+    "electron-store": "^10.1.0",
+    "electron-updater": "^6.6.2"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [],
+  "devDependencies": {
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.example.videoshuffle",
+    "productName": "VideoShuffle",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "brandonhenry",
+        "repo": "videoshuffle"
+      }
+    ]
+  }
 }
