@@ -1,6 +1,6 @@
 {
   "name": "videoshuffle",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "A simple Electron app for video shuffling",
   "main": "main.js",
   "scripts": {
