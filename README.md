@@ -11,12 +11,16 @@ Latest release: https://github.com/brandonhenry/videoshuffle/releases
 
 **Windows Prerequisites**
 
+WINDOWS ONLY!!
+
 You must have FFMPEG installed to use this. 
 
 Please see this guide on how to install: https://phoenixnap.com/kb/ffmpeg-windows
 
 
 **macOS Prerequisites**
+
+MACBOOK ONLY!!
 
 If you don't have Homebrew installed, run:
 
