@@ -8,7 +8,7 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "release": "gh workflow run \"Build & Publish\" --ref main",
-    "tag": "npm version patch && git push origin main --follow-tags"
+    "tag": "git commit . -m 'stuff' && git push && npm version patch && git push origin main --follow-tags"
   },
   "dependencies": {
     "electron-reload": "*",
