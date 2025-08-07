@@ -7,6 +7,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const progressBar = document.getElementById('progress-bar');
   const timeRemaining = document.getElementById('time-remaining');
   const resultActions = document.getElementById('result-actions');
+  const installFFmpegBtn = document.getElementById('install-ffmpeg');
   const openVideoBtn = document.getElementById('open-video');
   const openFolderBtn = document.getElementById('open-folder');
   const clearHistoryBtn = document.getElementById('clear-history');
@@ -152,6 +153,19 @@ window.addEventListener('DOMContentLoaded', () => {
         const remaining = elapsed * (100 - percent) / percent;
         timeRemaining.textContent = `Time left: ${formatTime(remaining)}`;
       }
+    }
+  });
+
+  // Install FFmpeg on demand
+  installFFmpegBtn.addEventListener('click', async () => {
+    statusEl.textContent = 'Installing FFmpeg...';
+    statusEl.classList.remove('error');
+    try {
+      const msg = await window.electronAPI.installFFmpeg();
+      statusEl.textContent = msg;
+    } catch (err) {
+      statusEl.textContent = 'FFmpeg install failed: ' + err.message;
+      statusEl.classList.add('error');
     }
   });
 

@@ -232,6 +232,26 @@ ipcMain.handle('history:clear', async () => {
   store.set('history', []);
   return [];
 });
+// One-click FFmpeg install
+ipcMain.handle('install-ffmpeg', async () => {
+  if (process.platform === 'darwin') {
+    return new Promise((resolve, reject) => {
+      execFile('brew', ['install', 'ffmpeg'], (error, stdout, stderr) => {
+        if (error) reject(stderr || error.message);
+        else resolve('Installed via Homebrew');
+      });
+    });
+  } else if (process.platform === 'win32') {
+    return new Promise((resolve, reject) => {
+      execFile('choco', ['install', 'ffmpeg', '-y'], (error, stdout, stderr) => {
+        if (error) reject(stderr || error.message);
+        else resolve('Installed via Chocolatey');
+      });
+    });
+  } else {
+    throw new Error('Platform not supported');
+  }
+});
 // IPC handlers for opening and revealing the processed video
 ipcMain.handle('video:open', (event, filePath) => {
   return shell.openPath(filePath);
