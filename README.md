@@ -38,3 +38,21 @@ brew install ffmpeg
 7. Wait til the bar fills.
 
 8. Done!
+
+# Features
+
+- View all previous projects
+
+- Preview all previous projects
+
+- Set minimum cut time 
+
+- Set maximum cut time
+
+- Set total video duration (2 or 2:00 works. you can specify down to the second)
+
+- Clear list of recent projects completed
+
+- MP4 only to start
+
+- Automatic updates
