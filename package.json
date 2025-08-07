@@ -1,6 +1,6 @@
 {
   "name": "videoshuffle",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "A simple Electron app for video shuffling",
   "main": "main.js",
   "scripts": {
@@ -45,11 +45,17 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64","arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         },
         {
           "target": "zip",
-          "arch": ["x64","arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "hardenedRuntime": true,
