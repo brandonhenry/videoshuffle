@@ -54,9 +54,11 @@ window.addEventListener('DOMContentLoaded', () => {
   processBtn.addEventListener('click', async () => {
     if (selectedFiles.length === 0) {
       statusEl.textContent = 'Please select files first.';
+      statusEl.classList.add('error');
       return;
     }
     statusEl.textContent = 'Processing...';
+    statusEl.classList.remove('error');
     processingStartTime = Date.now();
     progressBar.hidden = false;
     timeRemaining.hidden = false;
@@ -69,6 +71,7 @@ window.addEventListener('DOMContentLoaded', () => {
         progressBar.hidden = true;
         timeRemaining.hidden = true;
         statusEl.textContent = `Video saved to ${result.output}`;
+        statusEl.classList.remove('error');
         resultActions.classList.remove('hidden');
         openVideoBtn.addEventListener('click', () => window.electronAPI.openVideo(result.output));
         openFolderBtn.addEventListener('click', () => window.electronAPI.revealVideo(result.output));
@@ -82,6 +85,7 @@ window.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       progressBar.hidden = true;
       timeRemaining.hidden = true;
+      statusEl.classList.add('error');
       statusEl.textContent = 'Error: ' + err.message;
     }
   });

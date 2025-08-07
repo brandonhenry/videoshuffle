@@ -103,7 +103,8 @@ async function getDuration(file) {
 // Helper: extract a timed segment using GPAC's MP4Box CLI
 async function extractSegment(file, startTime, duration, outputPath, removeAudio, width, height, fps) {
   return new Promise((resolve, reject) => {
-    // Re-encode segment with uniform resolution and fps
+    // Re-encode segment with uniform resolution and fps, capturing stderr
+    const stderrLines = [];
     let command = ffmpeg(file)
       .seekInput(startTime)
       .duration(duration)
@@ -116,9 +117,12 @@ async function extractSegment(file, startTime, duration, outputPath, removeAudio
     }
     command
       .on('start', cmd => console.log('FFmpeg extract command:', cmd))
-      .on('stderr', line => console.error('FFmpeg extract stderr:', line))
+      .on('stderr', line => { stderrLines.push(line); console.error('FFmpeg extract stderr:', line); })
       .on('end', resolve)
-      .on('error', err => { console.error('Segment extraction error:', err); reject(err); })
+      .on('error', err => {
+        console.error('Segment extraction error:', err);
+        reject(new Error(`FFmpeg extract failed: ${stderrLines.join('\n')}`));
+      })
       .save(outputPath);
   });
 }
@@ -188,14 +192,18 @@ ipcMain.handle('videos:process', async (event, files, options) => {
   const playlistFile = path.join(tmpDir, `playlist_${Date.now()}.txt`);
   fs.writeFileSync(playlistFile, clipPaths.map(p => `file '${p}'`).join('\n') + '\n');
   await new Promise((resolve, reject) => {
+    const stderrLines = [];
     ffmpeg()
       .input(playlistFile)
       .inputOptions(['-f', 'concat', '-safe', '0'])
       .outputOptions(['-c', 'copy', '-t', options.maxDuration.toString()])
       .on('start', cmd => console.log('FFmpeg merge command:', cmd))
-      .on('stderr', line => console.error('FFmpeg merge stderr:', line))
+      .on('stderr', line => { stderrLines.push(line); console.error('FFmpeg merge stderr:', line); })
       .on('end', resolve)
-      .on('error', err => { console.error('Merge error:', err); reject(err); })
+      .on('error', err => {
+        console.error('Merge error:', err);
+        reject(new Error(`FFmpeg merge failed: ${stderrLines.join('\n')}`));
+      })
       .save(outputMerged);
   });
   // Clean up temporary clips and playlist
