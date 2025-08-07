@@ -14,12 +14,16 @@ const { autoUpdater } = require('electron-updater');
 
 // Add helper to load electron-store module from unpacked ASAR in packaged builds
 async function loadStore() {
+  // Dynamically load electron-store module, handling packaged vs dev paths
+  let modulePath;
   if (app.isPackaged) {
-    const storePath = path.join(process.resourcesPath, 'app.asar.unpacked', 'node_modules', 'electron-store', 'index.js');
-    const StoreModule = await import(`file://${storePath}`);
-    return StoreModule.default;
+    // In a packaged build (asar disabled or otherwise), app.getAppPath() points to 'Resources/app'
+    modulePath = path.join(app.getAppPath(), 'node_modules', 'electron-store', 'index.js');
+  } else {
+    // In development, resolve via require
+    modulePath = require.resolve('electron-store');
   }
-  const StoreModule = await import('electron-store');
+  const StoreModule = await import(`file://${modulePath}`);
   return StoreModule.default;
 }
 
