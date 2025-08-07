@@ -22,7 +22,7 @@ jobs:
       - name: Build & publish macOS
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npm run dist -- --mac --publish always
+        run: npm run dist -- --mac --universal --publish always
 
   build-win:
     runs-on: windows-latest
