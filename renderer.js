@@ -41,6 +41,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const removeAudioCheckbox = document.getElementById('remove-audio');
   const minLengthInput = document.getElementById('min-length');
   const maxLengthInput = document.getElementById('max-length');
+  const autoSplitCheckbox = document.getElementById('auto-split');
   const maxDurationInput = document.getElementById('max-duration');
   const darkModeCheckbox = document.getElementById('dark-mode');
   const saveSettingsBtn = document.getElementById('save-settings');
@@ -83,6 +84,7 @@ window.addEventListener('DOMContentLoaded', () => {
   settingsBtn.addEventListener('click', async () => {
     const settings = await window.electronAPI.getSettings();
     darkModeCheckbox.checked = settings.darkMode;
+    autoSplitCheckbox.checked = settings.autoSplit;
     saveLocationInput.value = settings.saveLocation;
     settingsModal.classList.remove('hidden');
   });
@@ -134,7 +136,8 @@ window.addEventListener('DOMContentLoaded', () => {
       maxLength: Number(maxLengthInput.value),
       darkMode: darkModeCheckbox.checked,
       maxDuration: (() => { const parts = maxDurationInput.value.split(':'); return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || '0', 10); })(),
-      saveLocation: saveLocationInput.value
+      saveLocation: saveLocationInput.value,
+      autoSplit: autoSplitCheckbox.checked
     };
     await window.electronAPI.setSettings(newSettings);
     document.body.classList.toggle('dark-mode', newSettings.darkMode);

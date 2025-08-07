@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 require('electron-reload')(__dirname);
-const { execFile } = require('child_process');
+const { execFile, spawn } = require('child_process');
 
 const ffmpegPath = require('ffmpeg-static') || 'ffmpeg';
 const ffmpeg = require('fluent-ffmpeg');
@@ -79,13 +79,31 @@ ipcMain.handle('dialog:openFiles', async (event) => {
 
 ipcMain.handle('settings:get', async () => {
   const Store = await loadStore();
-  const store = new Store({ defaults: { removeAudio: false, minLength: 3, maxLength: 5, darkMode: false, maxDuration: 600, history: [], saveLocation: os.tmpdir() } });
+  const store = new Store({ defaults: {
+    removeAudio: false,
+    autoSplit: false,
+    minLength: 3,
+    maxLength: 5,
+    darkMode: false,
+    maxDuration: 600,
+    history: [],
+    saveLocation: os.tmpdir()
+  } });
   return store.store;
 });
 
 ipcMain.handle('settings:set', async (event, settings) => {
   const Store = await loadStore();
-  const store = new Store({ defaults: { removeAudio: false, minLength: 3, maxLength: 5, darkMode: false, maxDuration: 600, history: [], saveLocation: os.tmpdir() } });
+  const store = new Store({ defaults: {
+    removeAudio: false,
+    autoSplit: false,
+    minLength: 3,
+    maxLength: 5,
+    darkMode: false,
+    maxDuration: 600,
+    history: [],
+    saveLocation: os.tmpdir()
+  } });
   store.set(settings);
   return store.store;
 });
@@ -145,22 +163,42 @@ ipcMain.handle('videos:process', async (event, files, options) => {
   const segments = [];
   let processedTime = 0;
   let segmentIndex = 0;
-  while (processedTime < totalDurationSec) {
-    // Determine segment length (clamp to remaining overall time)
-    let segLen = options.minLength + Math.random() * (options.maxLength - options.minLength);
-    const remainingOverall = totalDurationSec - processedTime;
-    if (segLen > remainingOverall) segLen = remainingOverall;
+  if (options.autoSplit) {
+    for (let fileIndex = 0; fileIndex < files.length && processedTime < totalDurationSec; fileIndex++) {
+      const file = files[fileIndex];
+      event.sender.send('videos:progress', `Detecting cuts in file ${fileIndex+1}/${files.length}`);
+      const fileDuration = await getDuration(file);
+      const cuts = await detectJumpCuts(file);
+      const times = [0, ...cuts.filter(t => t > 0 && t < fileDuration).sort((a, b) => a - b), fileDuration];
+      for (let i = 0; i < times.length - 1 && processedTime < totalDurationSec; i++) {
+        const startTime = times[i];
+        let duration = times[i+1] - times[i];
+        if (processedTime + duration > totalDurationSec) {
+          duration = totalDurationSec - processedTime;
+        }
+        segments.push({ file, startTime, duration, fileIndex, segmentIndex });
+        processedTime += duration;
+        segmentIndex++;
+      }
+    }
+  } else {
+    while (processedTime < totalDurationSec) {
+      // Determine segment length (clamp to remaining overall time)
+      let segLen = options.minLength + Math.random() * (options.maxLength - options.minLength);
+      const remainingOverall = totalDurationSec - processedTime;
+      if (segLen > remainingOverall) segLen = remainingOverall;
 
-    // Pick a random file and compute a random start within its duration
-    const fileIndex = Math.floor(Math.random() * files.length);
-    const file = files[fileIndex];
-    const fileDuration = await getDuration(file);
-    const maxStart = fileDuration - segLen;
-    const startTime = maxStart > 0 ? Math.random() * maxStart : 0;
+      // Pick a random file and compute a random start within its duration
+      const fileIndex = Math.floor(Math.random() * files.length);
+      const file = files[fileIndex];
+      const fileDuration = await getDuration(file);
+      const maxStart = fileDuration - segLen;
+      const startTime = maxStart > 0 ? Math.random() * maxStart : 0;
 
-    segments.push({ file, startTime, duration: segLen, fileIndex, segmentIndex });
-    processedTime += segLen;
-    segmentIndex++;
+      segments.push({ file, startTime, duration: segLen, fileIndex, segmentIndex });
+      processedTime += segLen;
+      segmentIndex++;
+    }
   }
   console.log(`Generated ${segments.length} segments totalling ${processedTime.toFixed(2)}s (expected ${totalDurationSec}s)`);
 
@@ -298,3 +336,33 @@ ipcMain.handle('dialog:openDirectory', async (event) => {
 ipcMain.handle('app:getVersion', () => {
   return app.getVersion();
 });
+
+// Function to detect scene jump cuts via ffmpeg scene filter
+async function detectJumpCuts(file) {
+  return new Promise((resolve, reject) => {
+    const timestamps = [];
+    // Use ffmpeg -filter:v to combine scene detection and showinfo
+    const args = [
+      '-i', file,
+      '-filter:v', "select='gt(scene,0.4)',showinfo",
+      '-f', 'null',
+      '-'
+    ];
+    const proc = spawn(ffmpegPath, args);
+    proc.stderr.on('data', data => {
+      const str = data.toString();
+      const regex = /pts_time:([0-9]+\.?[0-9]*)/g;
+      let match;
+      while ((match = regex.exec(str)) !== null) {
+        timestamps.push(parseFloat(match[1]));
+      }
+    });
+    proc.on('close', code => {
+      if (code !== 0) {
+        reject(new Error('Scene detection failed'));
+      } else {
+        resolve(timestamps);
+      }
+    });
+  });
+}
