@@ -3,9 +3,9 @@ const path = require('path');
 require('electron-reload')(__dirname);
 const { execFile } = require('child_process');
 
-const ffmpegPath = require('ffmpeg-static');
+const ffmpegPath = require('ffmpeg-static') || 'ffmpeg';
 const ffmpeg = require('fluent-ffmpeg');
-const ffprobePath = require('ffprobe-static').path;
+const ffprobePath = require('ffprobe-static').path || 'ffprobe';
 const os = require('os');
 const fs = require('fs');
 ffmpeg.setFfmpegPath(ffmpegPath);

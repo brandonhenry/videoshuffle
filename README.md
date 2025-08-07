@@ -8,16 +8,22 @@ A simple Electron app for shuffling video files.
 npm install
 ```
 
+**macOS Prerequisites**
+
+If you don't have Homebrew installed, run:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Then install FFmpeg:
+
+```bash
+brew install ffmpeg
+```
+
 ## Usage
 
 ```bash
 npm start
 ```
-
-## Development
-
-Make changes to the source files and the app will reload automatically.
-
-## License
-
-MIT
