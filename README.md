@@ -6,6 +6,16 @@ A simple Electron app for shuffling video files.
 
 Download the latest release and install. 
 
+Latest release: https://github.com/brandonhenry/videoshuffle/releases
+
+
+**Windows Prerequisites**
+
+You must have FFMPEG installed to use this. 
+
+Please see this guide on how to install: https://phoenixnap.com/kb/ffmpeg-windows
+
+
 **macOS Prerequisites**
 
 If you don't have Homebrew installed, run:
