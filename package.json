@@ -6,7 +6,9 @@
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "release": "gh workflow run \"Build & Publish\" --ref main",
+    "tag": "npm version patch && git push origin main --follow-tags"
   },
   "dependencies": {
     "electron-reload": "*",
