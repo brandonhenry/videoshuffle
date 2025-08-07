@@ -12,6 +12,17 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 const { autoUpdater } = require('electron-updater');
 
+// Add helper to load electron-store module from unpacked ASAR in packaged builds
+async function loadStore() {
+  if (app.isPackaged) {
+    const storePath = path.join(process.resourcesPath, 'app.asar.unpacked', 'node_modules', 'electron-store', 'index.js');
+    const StoreModule = await import(`file://${storePath}`);
+    return StoreModule.default;
+  }
+  const StoreModule = await import('electron-store');
+  return StoreModule.default;
+}
+
 app.setName('Shufflr');
 
 function createWindow() {
@@ -63,13 +74,13 @@ ipcMain.handle('dialog:openFiles', async (event) => {
 });
 
 ipcMain.handle('settings:get', async () => {
-  const { default: Store } = await import('electron-store');
+  const Store = await loadStore();
   const store = new Store({ defaults: { removeAudio: false, minLength: 3, maxLength: 5, darkMode: false, maxDuration: 600, history: [] } });
   return store.store;
 });
 
 ipcMain.handle('settings:set', async (event, settings) => {
-  const { default: Store } = await import('electron-store');
+  const Store = await loadStore();
   const store = new Store({ defaults: { removeAudio: false, minLength: 3, maxLength: 5, darkMode: false, maxDuration: 600, history: [] } });
   store.set(settings);
   return store.store;
@@ -191,12 +202,12 @@ ipcMain.handle('videos:process', async (event, files, options) => {
 
 // IPC handlers for project history
 ipcMain.handle('history:get', async () => {
-  const { default: Store } = await import('electron-store');
+  const Store = await loadStore();
   const store = new Store({ defaults: { removeAudio: false, minLength: 3, maxLength: 5, darkMode: false, maxDuration: 600, history: [] } });
   return store.get('history', []);
 });
 ipcMain.handle('history:save', async (event, files) => {
-  const { default: Store } = await import('electron-store');
+  const Store = await loadStore();
   const store = new Store({ defaults: { removeAudio: false, minLength: 3, maxLength: 5, darkMode: false, maxDuration: 600, history: [] } });
   let history = store.get('history', []);
   history.unshift(files);
@@ -204,7 +215,7 @@ ipcMain.handle('history:save', async (event, files) => {
   return history;
 });
 ipcMain.handle('history:clear', async () => {
-  const { default: Store } = await import('electron-store');
+  const Store = await loadStore();
   const store = new Store({ defaults: { removeAudio: false, minLength: 3, maxLength: 5, darkMode: false, maxDuration: 600, history: [] } });
   store.set('history', []);
   return [];
