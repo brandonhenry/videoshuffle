@@ -1,4 +1,4 @@
-# VideoShuffle
+# Fractal Video Shufflr
 
 A simple Electron app for shuffling video files.
 
