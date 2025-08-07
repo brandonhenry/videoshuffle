@@ -50,7 +50,7 @@
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
       "minimumSystemVersion": "10.12.6",
-      "x64ArchFiles": "**/node_modules/{ffmpeg-static,ffprobe-static}/*"
+      "x64ArchFiles": "**/node_modules/{ffmpeg-static,ffprobe-static}/**/*"
     },
     "win": {
       "target": [
