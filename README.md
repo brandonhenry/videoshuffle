@@ -1,6 +1,6 @@
 # Fractal Video Shufflr
 
-A simple Electron app for shuffling video files.
+A simple app for shuffling video files. Download, load your files, choose your settings, and merge!
 
 ## Installation
 
