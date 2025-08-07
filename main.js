@@ -12,10 +12,14 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 const { autoUpdater } = require('electron-updater');
 
+app.setName('Shufflr');
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    title: 'Shufflr',
+    icon: path.join(__dirname, 'icon.png'),
     fullscreenable: false,
     fullscreen: false,
     webPreferences: {
@@ -28,6 +32,10 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Set the dock icon on macOS
+  if (app.dock) {
+    app.dock.setIcon(path.join(__dirname, 'icon.png'));
+  }
   createWindow();
   autoUpdater.checkForUpdatesAndNotify();
 });
