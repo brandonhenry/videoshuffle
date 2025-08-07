@@ -22,6 +22,19 @@ brew install ffmpeg
 
 ## Usage
 
-```bash
-npm start
-```
+
+1. Download from Github
+
+2. Install Fractal Video Shufflr
+
+3. Open Fractal Video Shufflr
+
+4. Select Files
+
+5. Open settings to configure
+
+6. Click 'Shuffle & Merge!'
+
+7. Wait til the bar fills.
+
+8. Done!
