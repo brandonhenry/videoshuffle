@@ -49,6 +49,8 @@ brew install ffmpeg
 
 - Set maximum cut time
 
+- Auto scene detection (does not use cut time)
+
 - Set total video duration (2 or 2:00 works. you can specify down to the second)
 
 - Clear list of recent projects completed
