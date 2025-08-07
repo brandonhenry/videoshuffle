@@ -35,6 +35,7 @@ Then install FFmpeg:
 brew install ffmpeg
 ```
 <hr>
+
 ## Usage
 
 
@@ -54,7 +55,7 @@ brew install ffmpeg
 
 8. Done!
 
-# Features
+## Features
 
 - View all previous projects
 
