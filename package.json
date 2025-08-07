@@ -26,6 +26,7 @@
     "electron-builder": "^26.0.12"
   },
   "build": {
+    "asar": false,
     "appId": "com.example.videoshuffle",
     "productName": "VideoShuffle",
     "directories": {
