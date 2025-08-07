@@ -79,13 +79,13 @@ ipcMain.handle('dialog:openFiles', async (event) => {
 
 ipcMain.handle('settings:get', async () => {
   const Store = await loadStore();
-  const store = new Store({ defaults: { removeAudio: false, minLength: 3, maxLength: 5, darkMode: false, maxDuration: 600, history: [] } });
+  const store = new Store({ defaults: { removeAudio: false, minLength: 3, maxLength: 5, darkMode: false, maxDuration: 600, history: [], saveLocation: os.tmpdir() } });
   return store.store;
 });
 
 ipcMain.handle('settings:set', async (event, settings) => {
   const Store = await loadStore();
-  const store = new Store({ defaults: { removeAudio: false, minLength: 3, maxLength: 5, darkMode: false, maxDuration: 600, history: [] } });
+  const store = new Store({ defaults: { removeAudio: false, minLength: 3, maxLength: 5, darkMode: false, maxDuration: 600, history: [], saveLocation: os.tmpdir() } });
   store.set(settings);
   return store.store;
 });
@@ -260,6 +260,12 @@ ipcMain.handle('video:reveal', (event, filePath) => {
   shell.showItemInFolder(filePath);
   return true;
 });
+// Add handler for opening the save location
+ipcMain.handle('dialog:openSaveLocation', (event, dirPath) => {
+  const target = dirPath || os.tmpdir();
+  shell.openPath(target);
+  return target;
+});
 
 // Auto-update event handlers
 autoUpdater.on('update-available', () => {
@@ -278,4 +284,17 @@ autoUpdater.on('update-downloaded', () => {
   }).then(({response}) => {
     if (response === 0) autoUpdater.quitAndInstall();
   });
+});
+
+ipcMain.handle('dialog:openDirectory', async (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+    properties: ['openDirectory', 'createDirectory']
+  });
+  return canceled ? null : filePaths[0];
+});
+
+// Expose application version
+ipcMain.handle('app:getVersion', () => {
+  return app.getVersion();
 });

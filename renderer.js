@@ -11,7 +11,29 @@ window.addEventListener('DOMContentLoaded', () => {
   const openVideoBtn = document.getElementById('open-video');
   const openFolderBtn = document.getElementById('open-folder');
   const clearHistoryBtn = document.getElementById('clear-history');
+  const openSaveLocationBtn = document.getElementById('open-save-location');
   let selectedFiles = [];
+  // Helper to add file thumbnail and remove button
+  const addFile = file => {
+    selectedFiles.push(file);
+    const li = document.createElement('li');
+    const videoEl = document.createElement('video');
+    videoEl.src = `file://${file}`;
+    videoEl.controls = true;
+    videoEl.width = 160;
+    videoEl.height = 90;
+    videoEl.style.objectFit = 'cover';
+    li.appendChild(videoEl);
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = '×';
+    removeBtn.classList.add('remove-btn');
+    removeBtn.addEventListener('click', () => {
+      selectedFiles = selectedFiles.filter(f => f !== file);
+      li.remove();
+    });
+    li.appendChild(removeBtn);
+    fileList.appendChild(li);
+  };
   let processingStartTime = null;
 
   // Settings modal elements
@@ -23,32 +45,45 @@ window.addEventListener('DOMContentLoaded', () => {
   const darkModeCheckbox = document.getElementById('dark-mode');
   const saveSettingsBtn = document.getElementById('save-settings');
   const cancelSettingsBtn = document.getElementById('cancel-settings');
+  const installFFmpegSettingsBtn = document.getElementById('install-ffmpeg-settings');
+  const saveLocationInput = document.getElementById('save-location');
+  const browseSaveLocationBtn = document.getElementById('browse-save-location');
 
   selectBtn.addEventListener('click', async () => {
     const files = await window.electronAPI.openFiles();
-    selectedFiles = files;
     fileList.innerHTML = '';
-    files.forEach(file => {
-      const li = document.createElement('li');
-      const videoEl = document.createElement('video');
-      videoEl.src = `file://${file}`;
-      videoEl.controls = true;
-      videoEl.width = 160;
-      videoEl.height = 90;
-      videoEl.style.objectFit = 'cover';
-      li.appendChild(videoEl);
-      fileList.appendChild(li);
-    });
+    selectedFiles = [];
+    files.forEach(file => addFile(file));
     // Further processing will be triggered here
+  });
+
+  // Drag and drop functionality
+  const dropArea = document.getElementById('drop-area');
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, e => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropArea.classList.add('dragover');
+    });
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, e => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropArea.classList.remove('dragover');
+    });
+  });
+  dropArea.addEventListener('drop', async e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = Array.from(e.dataTransfer.files).map(f => f.path);
+    files.forEach(file => addFile(file));
   });
 
   settingsBtn.addEventListener('click', async () => {
     const settings = await window.electronAPI.getSettings();
-    removeAudioCheckbox.checked = settings.removeAudio;
-    minLengthInput.value = settings.minLength;
-    maxLengthInput.value = settings.maxLength;
     darkModeCheckbox.checked = settings.darkMode;
-    maxDurationInput.value = formatTime(settings.maxDuration * 1000);
+    saveLocationInput.value = settings.saveLocation;
     settingsModal.classList.remove('hidden');
   });
 
@@ -98,7 +133,8 @@ window.addEventListener('DOMContentLoaded', () => {
       minLength: Number(minLengthInput.value),
       maxLength: Number(maxLengthInput.value),
       darkMode: darkModeCheckbox.checked,
-      maxDuration: (() => { const parts = maxDurationInput.value.split(':'); return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || '0', 10); })()
+      maxDuration: (() => { const parts = maxDurationInput.value.split(':'); return parseInt(parts[0], 10) * 60 + parseInt(parts[1] || '0', 10); })(),
+      saveLocation: saveLocationInput.value
     };
     await window.electronAPI.setSettings(newSettings);
     document.body.classList.toggle('dark-mode', newSettings.darkMode);
@@ -107,6 +143,18 @@ window.addEventListener('DOMContentLoaded', () => {
   cancelSettingsBtn.addEventListener('click', () => {
     settingsModal.classList.add('hidden');
   });
+  // Settings modal FFmpeg install
+  installFFmpegSettingsBtn.addEventListener('click', async () => {
+   statusEl.textContent = 'Installing FFmpeg...';
+   statusEl.classList.remove('error');
+   try {
+     const msg = await window.electronAPI.installFFmpeg();
+     statusEl.textContent = msg;
+   } catch (err) {
+     statusEl.textContent = 'FFmpeg install failed: ' + err.message;
+     statusEl.classList.add('error');
+   }
+});
 
   async function loadSettings() {
     const settings = await window.electronAPI.getSettings();
@@ -156,18 +204,34 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Install FFmpeg on demand
-  installFFmpegBtn.addEventListener('click', async () => {
-    statusEl.textContent = 'Installing FFmpeg...';
-    statusEl.classList.remove('error');
-    try {
-      const msg = await window.electronAPI.installFFmpeg();
-      statusEl.textContent = msg;
-    } catch (err) {
-      statusEl.textContent = 'FFmpeg install failed: ' + err.message;
-      statusEl.classList.add('error');
-    }
+  // Open save location button
+  openSaveLocationBtn.addEventListener('click', async () => {
+    const settings = await window.electronAPI.getSettings();
+    await window.electronAPI.openSaveLocation(settings.saveLocation);
   });
+  browseSaveLocationBtn.addEventListener('click', async () => {
+    console.log('Browse Save Location clicked');
+    try {
+      const dir = await window.electronAPI.openDirectory();
+      console.log('openDirectory returned:', dir);
+      if (dir) saveLocationInput.value = dir;
+    } catch (err) {
+      console.error('Error in openDirectory:', err);
+    }
+});
+  // Display app version in footer
+  const versionFooter = document.getElementById('version-footer');
+  if (versionFooter) {
+    window.electronAPI.getAppVersion().then(version => {
+      const tag = `v${version}`;
+      const link = document.createElement('a');
+      link.href = `https://github.com/brandonhenry/videoshuffle/releases/tag/${tag}`;
+      link.textContent = tag;
+      link.target = '_blank';
+      versionFooter.innerHTML = '';
+      versionFooter.appendChild(link);
+    });
+  }
 
 });
 

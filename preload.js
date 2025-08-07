@@ -10,6 +10,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveHistory: (files) => ipcRenderer.invoke('history:save', files),
   clearHistory: () => ipcRenderer.invoke('history:clear'),
   openVideo: (filePath) => ipcRenderer.invoke('video:open', filePath),
-  revealVideo: (filePath) => ipcRenderer.invoke('video:reveal'),
-  installFFmpeg: () => ipcRenderer.invoke('install-ffmpeg')
+  revealVideo: (filePath) => ipcRenderer.invoke('video:reveal', filePath),
+  openSaveLocation: (dir) => ipcRenderer.invoke('dialog:openSaveLocation', dir),
+  openDirectory: () => ipcRenderer.invoke('dialog:openDirectory'),
+  installFFmpeg: () => ipcRenderer.invoke('install-ffmpeg'),
+  getAppVersion: () => ipcRenderer.invoke('app:getVersion')
 });

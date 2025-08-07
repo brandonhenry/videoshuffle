@@ -11,15 +11,19 @@
   <div id="app">
     <header>
       <h1>Fractal Video Shufflr</h1>
-      <a id="donate-link" href="https://ko-fi.com/thebrandonhenry" target="_blank">Donate For Updates</a>
+        <a id="donate-link" href="https://ko-fi.com/thebrandonhenry" target="_blank" class="donate-container">
+        <span>Found this useful? Buy us a coffee!</span>
+        <img src="https://help.ko-fi.com/hc/theming_assets/01J9TX3M2FZ5C8RKX87J34HH0A" alt="Ko-fi Logo" style="max-width:65px; vertical-align: middle;" />
+      </a>
     </header>
     <main>
       <div class="controls">
         <button id="select-files">Select Files</button>
         <button id="process-videos">Shuffle & Merge!</button>
+        <button id="open-save-location">Open Save Location</button>
         <button id="open-settings">⚙️</button>
-        <button id="install-ffmpeg">Install FFmpeg</button>
       </div>
+      <div id="drop-area">Drag & Drop Files Here</div>
       <ul id="file-list"></ul>
       <div id="status"></div>
       <progress id="progress-bar" max="100" hidden></progress>
@@ -38,11 +42,14 @@
     <div id="settings-modal" class="modal hidden">
       <div class="modal-content">
         <h2>Settings</h2>
+        <button id="install-ffmpeg-settings">Install FFmpeg</button>
+        <hr>
         <label><input type="checkbox" id="remove-audio"/> Remove audio</label>
         <label>Min Clip Length (s): <input type="number" id="min-length" min="1" value="3"/></label>
         <label>Max Clip Length (s): <input type="number" id="max-length" min="1" value="5"/></label>
         <label>Max Output Duration (minutes or mm:ss): <input type="text" id="max-duration" value="10:00" pattern="\\d+(:\\d{2})?"/></label>
         <label><input type="checkbox" id="dark-mode"/> Dark mode</label>
+        <label>Save Location: <input type='text' id='save-location' readonly /><button id='browse-save-location'>Browse</button></label>
         <div class="modal-actions">
           <button id="save-settings">Save</button>
           <button id="cancel-settings">Cancel</button>
@@ -50,6 +57,7 @@
       </div>
     </div>
   </div>
+  <footer id="version-footer"></footer>
   <script src="renderer.js"></script>
 </body>
 </html>
