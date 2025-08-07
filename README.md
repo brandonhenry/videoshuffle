@@ -4,9 +4,7 @@ A simple Electron app for shuffling video files.
 
 ## Installation
 
-```bash
-npm install
-```
+Download the latest release and install. 
 
 **macOS Prerequisites**
 
