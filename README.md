@@ -18,6 +18,7 @@ You must have FFMPEG installed to use this.
 Please see this guide on how to install: https://phoenixnap.com/kb/ffmpeg-windows
 
 <hr>
+
 **macOS Prerequisites**
 
 MACBOOK ONLY!!
